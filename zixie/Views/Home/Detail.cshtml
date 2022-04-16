@@ -1,0 +1,42 @@
+﻿@using zixie.Models
+@model InstrumentsViewModel
+
+@{
+    foreach(Shares comp in Model.Shares)
+    {
+        ViewData["Title"] = comp.Name;
+    }
+    var user = Context.User.Identity;
+}
+<div class="info">
+<a href='javascript:history.go(-1)'><i class="fa fa-angle-left"></i> Back</a>
+@foreach(Shares comp in Model.Shares)
+{
+    <h1>@comp.Name</h1>
+    <span>@comp.Ticker</span> 
+}
+@if(user.IsAuthenticated) {
+    @foreach(Watchlist comp in Model.Watchlists)
+{
+            if (comp.Id_Instrument > 0)
+            {
+                <span id="delete_star" class="d-inline-block star-yellow" onclick="return DeleteFromWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
+                    <i class="fa fa-star"></i>
+                </span>
+                <span id="add_star" class="d-inline-block star-black d-none" onclick="return AddToWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
+                    <i class="fa fa-star-o"></i>
+                </span>
+            }
+        }
+        @if(Model.Watchlists.Count()==0)
+        {
+            <span id="delete_star" class="d-inline-block star-yellow d-none" onclick="return DeleteFromWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
+                    <i class="fa fa-star"></i>
+                </span>
+            <span id="add_star" class="d-inline-block star-black" onclick="return AddToWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
+                    <i class="fa fa-star-o"></i>
+                </span>
+        }
+    }
+
+</div>

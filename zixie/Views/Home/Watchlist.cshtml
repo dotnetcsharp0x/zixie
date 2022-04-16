@@ -1,0 +1,135 @@
+﻿@using zixie.Models
+@model InstrumentsViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    var user = Context.User.Identity;
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <table class="table table-hover">
+                <thead>
+    <tr>
+      @if (user.IsAuthenticated)
+                                {
+                                    <th scope="col">
+                                        <span class="d-inline-block star-black" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Watchlist">
+                    <i class="fa fa-star-o"></i>
+                </span></th>
+                                }
+      <th scope="col"></th>
+      <th scope="col">Name</th>
+      <th scope="col">Currency</th>
+    </tr>
+    </thead>
+    <tbody>
+                    @{
+                        int i = 0;
+                    }
+        @foreach(SharesTable comp in Model.SharesTable)
+{
+                        i = i + 1;
+                        var id = 0;
+                        string toggle_star = "";
+                        toggle_star = "toggle_star_" + i;
+                        <tr role="button" class="align-middle">
+                        @if (user.IsAuthenticated)
+                            {
+                                @if (comp.Watchlist != null)
+                                {
+                                    if(comp.Watchlist != null) {
+                                        id = comp.Watchlist.Id;
+                                    } 
+                                    else
+                                    {
+                                        id = 0;
+                                    }
+                                }
+                                <td scope="row" id="@toggle_star" class="first_row" onclick="Toggle_Watchlist('@id','@comp.Ticker','@i')">
+                                    <div>
+                                    @if (comp.Watchlist != null)
+                                    {
+                                        <span class="d-inline-block star-yellow" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
+                                            <i class="fa fa-star"></i>
+                                        </span>
+                                        <span class="d-inline-block star-black d-none" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
+                                            <i class="fa fa-star-o"></i>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="d-inline-block star-black" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
+                                            <i class="fa fa-star-o"></i>
+                                        </span>
+                                        <span class="d-inline-block star-yellow d-none" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
+                                            <i class="fa fa-star"></i>
+                                        </span>
+                                    }
+                                    </div>
+                                </td>
+                            }
+                            @{ 
+                                var img = @comp.Ticker+".jpg";
+                            }
+                            <td class="first_row"><img title="@comp.Name" src="/img/stocks/@img" onerror="this.onerror=null;this.src='/img/stocks/question.jpg';" height="50" width="50"/></td>
+                            <td onclick="window.location.href = '/Home/Detail/@comp.Ticker';">
+                         @comp.Name
+                    </td>
+                    <td onclick="window.location.href = '/Home/Detail/@comp.Ticker';">
+                         @comp.Currency
+                    </td>
+                    </tr>
+                    }
+    </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
+            <nav>
+  <ul class="pagination justify-content-center">
+@{
+    var prev=0;
+    var next=0;
+}
+@{ 
+    if(Convert.ToInt32(ViewData["Page"].ToString()) <= 1)
+    {
+        <li class="page-item disabled">
+            <a class="page-link" asp-controller="Home" asp-action="Watchlist" asp-route-id="0" tabindex="-1">Back</a>
+        </li>
+    }
+    else {
+        prev = Convert.ToInt32(ViewData["Page"].ToString())-1;
+        <li class="page-item">
+            <a class="page-link" asp-controller="Home" asp-action="Watchlist" asp-route-id="@prev" tabindex="-1">Back</a>
+        </li>
+    }
+}
+@foreach(int page_number in ViewBag.pages)
+{
+            if(@page_number > 0)
+            {
+                if (@page_number.ToString() == ViewData["Page"].ToString())
+                {
+                    <li class="page-item disabled"><a class="page-link" asp-controller="Home" asp-action="Watchlist" asp-route-id="@page_number">@page_number</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-controller="Home" asp-action="Watchlist" asp-route-id="@page_number">@page_number</a></li>
+                }
+            }
+}
+@{ 
+        next = Convert.ToInt32(ViewData["Page"].ToString())+1;
+        <li class="page-item">
+            <a class="page-link" asp-controller="Home" asp-action="Watchlist" asp-route-id="@next" tabindex="-1">Next</a>
+        </li>
+}
+  </ul>
+</nav>
+
+        </div>
+    </div>
+</div>

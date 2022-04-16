@@ -1,0 +1,163 @@
+﻿@{
+    var user = Context.User.Identity;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - invest</title>
+    <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/font-awesome.min.css" />
+    <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/site.css" />
+</head>
+<body>
+    <header class="container-fluid">
+        <div class="row">
+			<div class="col">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <nav class="navbar navbar-expand-lg navbar-light nav-top">
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                                  <span class="navbar-toggler-icon"></span>
+                                </button>
+                                <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                                    <a class="navbar-brand me-auto" href="/">Horizontal logo</a>
+                                    @*<ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-top">
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" aria-current="page">Stocks</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" aria-current="page" asp-action="Index" asp-controller="Crypto">Crypto</a>
+                                        </li> 
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" aria-current="page" asp-action="Index" asp-controller="Blog">Blog</a>
+                                        </li>     
+                                    </ul>*@
+                                    <ul class="navbar-nav d-flex">
+                                        <li class="nav-item dropdown notify-item">
+                                            <a class="nav-link dropdown-toggle notify" href="#" id="navbarDropdownMenuLinkNotify" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <div type="button" class="position-relative">
+                                                    <i class="fa fa-bell"></i>
+                                                    <span class="position-absolute translate-middle badge rounded-pill bg-danger">
+                                                        19
+                                                    <span class="visually-hidden">unread messages</span>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLinkNotify">
+                                                <li>
+                                                    <a class="dropdown-item" href="#">Some news</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#">Another news</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#">Something else here</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-user"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                                                @{
+                                                    if(user.IsAuthenticated) {
+                                                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                                                        <li><a class="dropdown-item" href="#">Portfolio</a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item" asp-controller="Home" asp-action="Logout_Action" >Exit</a></li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="Home" asp-action="Login" >Login</a></li>
+                                                        <li><a class="dropdown-item" asp-controller="Home" asp-action="Create" >Register</a></li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+			</div>
+		</div>
+    </header
+    <div class="container-fluid">
+        <main role="main" class="pb-3 row">
+            <div class="col mt-4">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <form class="d-flex search-box">
+                    <input class="w-100" type="search" placeholder="Search: ticker, feed, news, people..." aria-label="Search: ticker, feed, news, people...">
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-2 col-sm-3 col-xs-12">
+                <nav class ="navbar navbar-side">
+                    <ul class ="navbar-nav">
+                        <li class ="nav-item">
+                            <i class="fa fa-home"></i>
+                            <a asp-action="User" asp-controller="Home">My profile</a>
+                        </li>
+                        @if(user.IsAuthenticated) {
+                        <li class ="nav-item">
+                            <i class="fa fa-star-o"></i>
+                            <a asp-action="Watchlist" asp-controller="Home">Watchlist</a>
+                        </li>
+                        }
+                        <li class ="nav-item">
+                            <i class="fa fa-users"></i>
+                            <a asp-action="Index" asp-controller="Stocks">Users</a>
+                        </li>
+                        <li class ="nav-item">
+                            <i class="fa fa-comments"></i>
+                            <a asp-action="Index" asp-controller="Stocks">Messenger</a>
+                        </li>
+                        <li class ="nav-item">
+                            <i class="fa fa-rss"></i>
+                            <a asp-action="Index" asp-controller="Stocks">World</a>
+                        </li>
+                        <li class ="nav-item">
+                            <i class="fa fa-newspaper-o"></i>
+                            <a asp-action="Index" asp-controller="Stocks">News</a>
+                        </li>
+                        <li class ="nav-item">
+                            <i class="fa fa-book"></i>
+                            <a asp-action="Index" asp-controller="Stocks">Blog</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>  
+            <div class="col c-center">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</div>
+            
+        </main>
+    </div>
+<footer class="border-top footer text-muted w-100 bottom-0">
+    <div class="container">
+        &copy; 2022 - invest - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+<script>
+var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl)
+})
+</script>
+</body>
+</html>
