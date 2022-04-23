@@ -18,5 +18,6 @@ namespace zixie.Data
         public DbSet<zixie.Models.User> User { get; set; }
         public DbSet<zixie.Models.Shares> Shares { get; set; }
         public DbSet<zixie.Models.Watchlist> Watchlists { get; set; }
+        public DbSet<zixie.Models.Prices> Prices { get; set; }
     }
 }

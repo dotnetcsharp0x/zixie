@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<zixieContext>(options =>
 
 options.UseSqlServer(builder.Configuration.GetConnectionString("zixieContext")));
@@ -20,6 +20,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 
@@ -32,11 +33,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",

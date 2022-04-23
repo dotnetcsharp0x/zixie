@@ -7,4 +7,5 @@ public class InstrumentsViewModel
         public IEnumerable<Shares> Shares { get; set; }
         public IEnumerable<Watchlist> Watchlists { get; set; }
         public IEnumerable<SharesTable> SharesTable { get; set; }
+        public IEnumerable<Prices> Prices { get; set; }
     }

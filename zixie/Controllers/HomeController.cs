@@ -16,6 +16,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using System.Transactions;
 
 namespace zixie.Controllers
 {
@@ -25,6 +26,7 @@ namespace zixie.Controllers
         private readonly zixieContext _context;
         private readonly IHostApplicationLifetime _lifetime;
         private readonly int items_per_page = 10;
+        
         #endregion
         #region HomeController
         public HomeController(zixieContext context
@@ -54,17 +56,36 @@ namespace zixie.Controllers
                                join i in _context.Watchlists.Where(w=>w.Id_User==id_user) on p.Id equals i.Id_Instrument into i_group
                                from d in i_group.DefaultIfEmpty() 
                                    //where p.Currency == "rub"
-                               //where a.Id_User == id_user
                                select new SharesTable()
                                {
                                    Name = p.Name,
                                    Currency = p.Currency,
                                    Ticker = p.Ticker,
-                                   Watchlist = d// == null ? null : d
+                                   Figi = p.Figi,
+                                   Watchlist = d,
+                                   Price = (from u in _context.Prices
+                                            orderby u.Id descending
+                                            where u.Figi==p.Figi
+                                            select u.Price).AsParallel().First()
                                })
                               //.OrderBy(p => p.Name);
                               .Skip((int)id * items_per_page)
                               .Take(items_per_page);
+            //            using (var txn = new TransactionScope(
+            //    TransactionScopeOption.Required,
+            //    new TransactionOptions
+            //    {
+            //        IsolationLevel = IsolationLevel.ReadUncommitted
+            //    }
+            //))
+            //            {
+            //                Your LINQ to SQL query goes here
+            //            }
+
+
+            //var prices = (from p in _context.Prices 
+            //              join s in first_query on p.Figi equals s.Figi
+            //              select new Prices() { Figi = s.Figi,Price = p.Price });
             InstrumentsViewModel ivm = new InstrumentsViewModel { SharesTable = first_query};
 
             //var second_query = (from p in first_query select p).OrderBy(p=>p.Name);
@@ -103,13 +124,17 @@ namespace zixie.Controllers
                                join i in _context.Watchlists.Where(w => w.Id_User == id_user) on p.Id equals i.Id_Instrument into i_group
                                from d in i_group.DefaultIfEmpty()
                                    //where p.Currency == "rub"
-                               //where d.Id_User == id_user
+                                   //where d.Id_User == id_user
                                select new SharesTable()
                                {
                                    Name = p.Name,
                                    Currency = p.Currency,
                                    Ticker = p.Ticker,
-                                   Watchlist = d// == null ? null : d
+                                   Watchlist = d,// == null ? null : d
+                                   Price = (from u in _context.Prices
+                                            orderby u.Id descending
+                                            where u.Figi == p.Figi
+                                            select u.Price).AsParallel().First()
                                })
                               //.OrderBy(p => p.Name);
                               .Where(w=>w.Watchlist.Id_User==id_user)
@@ -257,7 +282,6 @@ namespace zixie.Controllers
         }
         #endregion
         #region Create_Action
-        [HttpGet]
         public async Task<IActionResult> Create_Action([Bind("Name,Email,Password,ConfirmPassword")] RegisterModel Login)
         {
             var user_auth = HttpContext.User.Identity;
