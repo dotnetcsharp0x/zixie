@@ -8,35 +8,98 @@
     }
     var user = Context.User.Identity;
 }
-<div class="info">
+<div class="info container-fluid">
+<div class="row">
+    <div class="col">
 <a href='javascript:history.go(-1)'><i class="fa fa-angle-left"></i> Back</a>
+</div>
+</div>
+<div class="row">
 @foreach(Shares comp in Model.Shares)
 {
-    <h1>@comp.Name</h1>
-    <span>@comp.Ticker</span> 
-}
-@if(user.IsAuthenticated) {
-    @foreach(Watchlist comp in Model.Watchlists)
-{
-            if (comp.Id_Instrument > 0)
+    var img = @comp.Ticker+".png";
+    <div class="col-xl-8 d-inline-flex">
+    <div class="align-self-center p-2">
+        <img title="@comp.Name" src="/img/stocks/@img" onerror="this.onerror=null;this.src='/img/stocks/question.jpg';" height="50" width="50"/>
+    </div>
+    <div class="align-self-center p-2">
+        <h1>@comp.Name</h1>
+    </div>
+    <div class="align-self-center p-2">
+        <span class="info-ticker rounded">@comp.Ticker</span> 
+    </div>
+    <div class="align-self-center p-2">
+        @if (user!=null)
+    {
+        if (user.IsAuthenticated)
+        {
+            @foreach (Watchlist wl in Model.Watchlists)
             {
-                <span id="delete_star" class="d-inline-block star-yellow" onclick="return DeleteFromWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
-                    <i class="fa fa-star"></i>
+                if (wl.Id_Instrument > 0)
+                {
+                    <span id="delete_star" class="d-inline-block star-yellow" onclick="return DeleteFromWatchlist('@foreach(Shares sh in Model.Shares){@sh.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
+                        <i class="fa fa-star border p-1 rounded"></i>
+                    </span>
+                    <span id="add_star" class="d-inline-block star-black d-none" onclick="return AddToWatchlist('@foreach(Shares sh in Model.Shares){@sh.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
+                        <i class="fa fa-star-o border p-1 rounded"></i>
+                    </span>
+                }
+            }
+            @if (Model.Watchlists.Count() == 0)
+            {
+                <span id="delete_star" class="d-inline-block star-yellow d-none" onclick="return DeleteFromWatchlist('@foreach(Shares sh in Model.Shares){@sh.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
+                    <i class="fa fa-star border p-1 rounded"></i>
                 </span>
-                <span id="add_star" class="d-inline-block star-black d-none" onclick="return AddToWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
-                    <i class="fa fa-star-o"></i>
+                <span id="add_star" class="d-inline-block star-black" onclick="return AddToWatchlist('@foreach(Shares sh in Model.Shares){@sh.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
+                    <i class="fa fa-star-o border p-1 rounded"></i>
                 </span>
             }
-        }
-        @if(Model.Watchlists.Count()==0)
-        {
-            <span id="delete_star" class="d-inline-block star-yellow d-none" onclick="return DeleteFromWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Delete from watchlist">
-                    <i class="fa fa-star"></i>
-                </span>
-            <span id="add_star" class="d-inline-block star-black" onclick="return AddToWatchlist('@foreach(Shares comp in Model.Shares){@comp.Ticker}')" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Add to watchlist">
-                    <i class="fa fa-star-o"></i>
-                </span>
+
         }
     }
+        </div>
+    </div>
+    <div class="col-xl-4 align-middle p-2">
+                <h2>@foreach(Prices pr in Model.Prices)
+                    {
+                        
+                                    var result = "";
 
+                                    if(comp.Currency=="rub")
+                                    {
+                                        result = "₽";
+
+                                    }
+                                    if(comp.Currency=="usd")
+                                    {
+                                        result = "$";
+
+                                    }
+                                    if(comp.Currency=="eur")
+                                    {
+                                        result ="€";
+                                    }
+                                    <div class="info-price-name">
+                                        @comp.Name price (@comp.Ticker)
+                                    </div>
+                                    <div>
+                                    @result
+                                @pr.Price
+                                </div>
+                    }</h2>
+            </div>
+    
+}
+    
+
+    </div>
+    @foreach(Shares comp in Model.Shares)
+{
+<div class="row mt-2">
+    <div class="col-xl-4">
+        <span class="info-ticker rounded">Stock</span>
+        <span class="info-ticker rounded">@comp.Sector</span>
+    </div>
+</div>
+}
 </div>

@@ -70,15 +70,33 @@
                                 </td>
                             }
                             @{ 
-                                var img = @comp.Ticker+".jpg";
+                                var img = @comp.Ticker+".png";
                             }
                             <td class="first_row"><img title="@comp.Name" src="/img/stocks/@img" onerror="this.onerror=null;this.src='/img/stocks/question.jpg';" height="50" width="50"/></td>
                             <td onclick="window.location.href = '/Home/Detail/@comp.Ticker';">
                          @comp.Name
                     </td>
                     <td onclick="window.location.href = '/Home/Detail/@comp.Ticker';">
-                        @comp.Price
-                         @comp.Currency
+                       @{
+                                    var result = "";
+
+                                    if(comp.Currency=="rub")
+                                    {
+                                        result = "₽";
+
+                                    }
+                                    if(comp.Currency=="usd")
+                                    {
+                                        result = "$";
+
+                                    }
+                                    if(comp.Currency=="eur")
+                                    {
+                                        result ="€";
+                                    }
+                                    }
+                                    @result
+                                @comp.Price
                     </td>
                     </tr>
                     }

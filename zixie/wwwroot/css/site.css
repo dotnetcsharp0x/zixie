@@ -119,7 +119,7 @@ input[type="search"]::-webkit-search-results-decoration {
     font-size:14pt;
 }
 .info h1 {
-    font-size:24pt;
+    font-size:20pt;
     margin-top:5px;
 }
 .info span {
@@ -129,7 +129,7 @@ input[type="search"]::-webkit-search-results-decoration {
     margin-bottom:15px;
 }
 .star-yellow {
-    color: #FFEE4B;
+    color: #F6B87E;
     text-align: center;
     width: 40px;
     cursor: pointer;
@@ -148,8 +148,8 @@ input[type="search"]::-webkit-search-results-decoration {
     width:50px;
     text-align:center;
 }
-.table img {
-    border-radius:30px;
+.table img, .info img {
+    border-radius: 30px;
 }
 table thead {
     border-bottom:2px solid #e9ecef;
@@ -168,6 +168,23 @@ td .ticker {
     font-size:12pt;
     color:#7d7d7d;
 }
+
+.info i {
+    font-size:12pt;
+}
+
+.info .info-ticker {
+    background-color:#E4EBF3;
+    padding:5px;
+    font-size:10pt;
+    font-weight:500;
+    color:#424242;
+}
+.info .info-price-name {
+    font-size: 10pt;
+    color: #546279;
+}
+
 /* cyrillic */
 @font-face {
     font-family: 'Ubuntu';

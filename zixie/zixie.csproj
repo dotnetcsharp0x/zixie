@@ -21,8 +21,4 @@
     <PackageReference Include="Tinkoff.InvestApi" Version="0.1.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
 </Project>

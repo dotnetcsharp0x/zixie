@@ -7,6 +7,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - invest</title>
+    @*
+    <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/mdb.min.css" />*@
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/font-awesome.min.css" />
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/site.css" />
@@ -48,13 +50,23 @@
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLinkNotify">
                                                 <li>
-                                                    <a class="dropdown-item" href="#">Some news</a>
+                                                    <a class="dropdown-item" href="#">
+                                                        <i class="fa fa-star"></i>
+                                                        <span>Some news</span>
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="#">Another news</a>
+                                                    <a class="dropdown-item" href="#">
+                                                        <i class="fa fa-comments"></i>
+                                                        <span>Another news</span>
+
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="#">Something else here</a>
+                                                    <a class="dropdown-item" href="#">
+                                                        <i class="fa fa-users"></i>
+                                                        <span>Something else here frinds new more</span>
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </li>
@@ -86,15 +98,17 @@
                 </div>
 			</div>
 		</div>
-    </header
+    </header>
     <div class="container-fluid">
         <main role="main" class="pb-3 row">
             <div class="col mt-4">
     <div class="container">
         <div class="row">
-            <div class="col">
-                <form class="d-flex search-box">
-                    <input class="w-100" type="search" placeholder="Search: ticker, feed, news, people..." aria-label="Search: ticker, feed, news, people...">
+            <div class="col dropdown">
+                <form id="search-autocomplete" class="d-flex search-box">
+                    <input autocomplete="off" id="form1" class="w-100 form-control" type="text" placeholder="Search: ticker, feed, news, people..." aria-label="Search: ticker, feed, news, people..." data-bs-toggle="dropdown" aria-expanded="false">
+                        <ul id="searched-elemets" class="dropdown-menu dropdown-menu-end w-100" aria-labelledby="search-autocomplete">                
+                        </ul>
                 </form>
             </div>
         </div>
@@ -112,6 +126,10 @@
                             <a asp-action="Watchlist" asp-controller="Home">Watchlist</a>
                         </li>
                         }
+                        <li class ="nav-item">
+                            <i class="fa fa-wrench"></i>
+                            <a asp-action="Tools" asp-controller="Stocks">Tools</a>
+                        </li>
                         <li class ="nav-item">
                             <i class="fa fa-users"></i>
                             <a asp-action="Index" asp-controller="Stocks">Users</a>

@@ -53,8 +53,8 @@ namespace zixie.Controllers
             }
             var first_query = (from p in _context.Shares
                                    //join i in _context.Watchlists on p equals i.Id into ps// p.Id equals i.Id_Instrument
-                               join i in _context.Watchlists.Where(w=>w.Id_User==id_user) on p.Id equals i.Id_Instrument into i_group
-                               from d in i_group.DefaultIfEmpty() 
+                               join i in _context.Watchlists.Where(w => w.Id_User == id_user) on p.Id equals i.Id_Instrument into i_group
+                               from d in i_group.DefaultIfEmpty()
                                    //where p.Currency == "rub"
                                select new SharesTable()
                                {
@@ -65,10 +65,10 @@ namespace zixie.Controllers
                                    Watchlist = d,
                                    Price = (from u in _context.Prices
                                             orderby u.Id descending
-                                            where u.Figi==p.Figi
+                                            where u.Figi == p.Figi
                                             select u.Price).AsParallel().First()
                                })
-                              //.OrderBy(p => p.Name);
+                              .OrderBy(p => p.Name)
                               .Skip((int)id * items_per_page)
                               .Take(items_per_page);
             //            using (var txn = new TransactionScope(
@@ -102,6 +102,26 @@ namespace zixie.Controllers
             {
                 ViewData["User_Id"] = 0;
             }
+            return View(ivm);
+        }
+        #endregion
+        #region SearchBox
+        public async Task<IActionResult> Search(string? id)
+        {
+            var searchStocks = (from s in _context.Shares where s.Ticker.Contains(@"/"+id+"/") 
+                                select new SharesTable()
+                                {
+                                    Name = s.Name,
+                                    Currency = s.Currency,
+                                    Ticker = s.Ticker,
+                                    Figi = s.Figi,
+                                    Price = (from u in _context.Prices
+                                             orderby u.Id descending
+                                             where u.Figi == s.Figi
+                                             select u.Price).AsParallel().First()
+                                });
+            InstrumentsViewModel ivm = new InstrumentsViewModel { SharesTable = searchStocks };
+            
             return View(ivm);
         }
         #endregion
@@ -199,9 +219,15 @@ namespace zixie.Controllers
                 id_user = users.Id;
             }
             List<Shares> shareModels = _context.Shares
-                .Select(c => new Shares { Ticker = c.Ticker, Name = c.Name, Figi = c.Figi, Isin = c.Isin})
+                .Select(c => new Shares { Ticker = c.Ticker, Name = c.Name, Figi = c.Figi, Isin = c.Isin,Currency=c.Currency,Sector=c.Sector })
                 .Where(m => m.Ticker == id)
                 .ToList();
+            List<Prices> prices = new List<Prices>();
+            var pric = (from u in _context.Prices
+                       orderby u.Id descending
+                       where u.Figi == shareModels.First().Figi
+                       select u).AsParallel().First();
+            prices.Add(pric);
             if (id_user > 0)
             {
                 List<Watchlist> watchlistModels = _context.Watchlists
@@ -209,12 +235,12 @@ namespace zixie.Controllers
                     .Where(m => m.Id_Instrument == id_insturment).Where(m => m.Id_User == id_user)
                     .ToList();
 
-                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = watchlistModels };
+                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = watchlistModels,Prices = prices };
                 return View(ivm);
             }
             else
             {
-                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = null };
+                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = null, Prices = prices };
                 return View(ivm);
             }
         }

@@ -15,7 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<zixieContext>(options =>
 
-options.UseSqlServer(builder.Configuration.GetConnectionString("zixieContext")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("zixieContext"),op=>
+    op.CommandTimeout(60)
+));
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
