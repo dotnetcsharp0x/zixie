@@ -8,7 +8,19 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col">
-            <table class="table table-hover">
+            
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#stocks" type="button" role="tab" aria-controls="stocks" aria-selected="true">Stocks</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#crypto" type="button" role="tab" aria-controls="crypto" aria-selected="false">Crypto</button>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="stocks" role="tabpanel" aria-labelledby="home-tab">
+
+      <table class="table table-hover">
                 <thead>
     <tr>
       @if (user.IsAuthenticated)
@@ -108,8 +120,7 @@
                     }
     </tbody>
             </table>
-        </div>
-    </div>
+    
     <div class="row mt-2">
         <div class="col">
             <nav>
@@ -157,4 +168,9 @@
 
         </div>
     </div>
+
+  </div>
+  <div class="tab-pane fade" id="crypto" role="tabpanel" aria-labelledby="profile-tab">2</div>
+
+            
 </div>

@@ -32,7 +32,7 @@ function Toggle_Watchlist(cl, ticker, i) {
             $('#toggle_star_' + i).find('.star-yellow').addClass('d-none');
             $('#toggle_star_' + i).find('.star-black').removeClass('d-none');
             $('#toggle_star_' + i).off('click');
-            $('#toggle_star_' + i).attr("onclick", "Toggle_Watchlist('" + 0 + "','" + ticker + "','" + i +"')");
+            $('#toggle_star_' + i).attr("onclick", "Toggle_Watchlist('" + 0 + "','" + ticker + "','" + i + "')");
         });
     }
     else {

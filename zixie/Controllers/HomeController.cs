@@ -41,67 +41,79 @@ namespace zixie.Controllers
         #region Index
         public async Task<IActionResult> Index(int? id)
         {
-            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
-            var users = await _context.User
-                .FirstOrDefaultAsync(m => m.Email == email);
-            if (id == null) id = 1;
-            id = id - 1;
-            int id_user = 0;
-            if (users != null)
-            {
-                id_user = users.Id;
-            }
-            var first_query = (from p in _context.Shares
-                                   //join i in _context.Watchlists on p equals i.Id into ps// p.Id equals i.Id_Instrument
-                               join i in _context.Watchlists.Where(w => w.Id_User == id_user) on p.Id equals i.Id_Instrument into i_group
-                               from d in i_group.DefaultIfEmpty()
-                                   //where p.Currency == "rub"
-                               select new SharesTable()
-                               {
-                                   Name = p.Name,
-                                   Currency = p.Currency,
-                                   Ticker = p.Ticker,
-                                   Figi = p.Figi,
-                                   Watchlist = d,
-                                   Price = (from u in _context.Prices
-                                            orderby u.Id descending
-                                            where u.Figi == p.Figi
-                                            select u.Price).AsParallel().First()
-                               })
-                              .OrderBy(p => p.Name)
-                              .Skip((int)id * items_per_page)
-                              .Take(items_per_page);
-            //            using (var txn = new TransactionScope(
-            //    TransactionScopeOption.Required,
-            //    new TransactionOptions
-            //    {
-            //        IsolationLevel = IsolationLevel.ReadUncommitted
-            //    }
-            //))
-            //            {
-            //                Your LINQ to SQL query goes here
-            //            }
+            InstrumentsViewModel ivm;
+         //   using (var tx = new System.Transactions.TransactionScope(TransactionScopeOption.Required,
+         //new TransactionOptions() { IsolationLevel = IsolationLevel.ReadUncommitted }))
+         //   {
+                var identity = (ClaimsIdentity)User.Identity;
+                var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+                var users = await _context.User
+                    .FirstOrDefaultAsync(m => m.Email == email);
+                if (id == null) id = 1;
+                id = id - 1;
+                int id_user = 0;
+                if (users != null)
+                {
+                    id_user = users.Id;
+                }
+                ViewData["UserEmail"] = id_user;
+                int to_skip = (int)id * items_per_page;
+                var first_query = (from p in _context.Shares
+                                       //join i in _context.Watchlists on p equals i.Id into ps// p.Id equals i.Id_Instrument
+                                   join i in _context.Watchlists.Where(w => w.Id_User == id_user) on p.Id equals i.Id_Instrument into i_group
+                                   from d in i_group.DefaultIfEmpty()
+                                       //where p.Currency == "rub"
+                                   select new SharesTable()
+                                   {
+                                       Name = p.Name,
+                                       Currency = p.Currency,
+                                       Ticker = p.Ticker,
+                                       Figi = p.Figi,
+                                       Watchlist = d,
+                                       Price = (from u in _context.Prices
+                                                orderby u.Id descending
+                                                where u.Figi == p.Figi
+                                                select u.Price).AsParallel().FirstOrDefault()
+                                   })
+                                  .OrderBy(p => p.Name)
+                                  .Skip(to_skip)
+                                  .Take(items_per_page);
+                string sql = first_query.ToQueryString();
+                Console.WriteLine("START:");
+                Console.WriteLine(sql);
+                Console.WriteLine("END:");
+                //            using (var txn = new TransactionScope(
+                //    TransactionScopeOption.Required,
+                //    new TransactionOptions
+                //    {
+                //        IsolationLevel = IsolationLevel.ReadUncommitted
+                //    }
+                //))
+                //            {
+                //                Your LINQ to SQL query goes here
+                //            }
 
 
-            //var prices = (from p in _context.Prices 
-            //              join s in first_query on p.Figi equals s.Figi
-            //              select new Prices() { Figi = s.Figi,Price = p.Price });
-            InstrumentsViewModel ivm = new InstrumentsViewModel { SharesTable = first_query};
+                //var prices = (from p in _context.Prices 
+                //              join s in first_query on p.Figi equals s.Figi
+                //              select new Prices() { Figi = s.Figi,Price = p.Price });
+                ivm = new InstrumentsViewModel { SharesTable = first_query };
 
-            //var second_query = (from p in first_query select p).OrderBy(p=>p.Name);
-            //var third_query = (from p in second_query select p).Take(10);
+                //var second_query = (from p in first_query select p).OrderBy(p=>p.Name);
+                //var third_query = (from p in second_query select p).Take(10);
 
-            //System.Diagnostics.Debug.WriteLine("test4: " + user.AuthenticationType + " " + user.Name + " " + user.IsAuthenticated);
-            ViewBag.pages = new List<int> { (int)id - 1, (int)id - 0, (int)id+1, (int)id + 2, (int)id + 3 };
-            ViewData["Page"] = (int)id+1;
-            if (users != null)
-            {
-                ViewData["User_Id"] = users.Id;
-            }
-            else
-            {
-                ViewData["User_Id"] = 0;
-            }
+                //System.Diagnostics.Debug.WriteLine("test4: " + user.AuthenticationType + " " + user.Name + " " + user.IsAuthenticated);
+                ViewBag.pages = new List<int> { (int)id - 1, (int)id - 0, (int)id + 1, (int)id + 2, (int)id + 3 };
+                ViewData["Page"] = (int)id + 1;
+                if (users != null)
+                {
+                    ViewData["User_Id"] = users.Id;
+                }
+                else
+                {
+                    ViewData["User_Id"] = 0;
+                }
+            //}
             return View(ivm);
         }
         #endregion
@@ -156,8 +168,9 @@ namespace zixie.Controllers
                                             where u.Figi == p.Figi
                                             select u.Price).AsParallel().First()
                                })
-                              //.OrderBy(p => p.Name);
+                              
                               .Where(w=>w.Watchlist.Id_User==id_user)
+                              .OrderBy(p => p.Name)
                               .Skip((int)id * items_per_page)
                               .Take(items_per_page);
             InstrumentsViewModel ivm = new InstrumentsViewModel { SharesTable = first_query };

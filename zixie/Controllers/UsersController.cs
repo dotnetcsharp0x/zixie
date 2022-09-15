@@ -44,6 +44,28 @@ namespace zixie.Controllers
             return View(user);
         }
 
+        // GET: Users/Profile/5
+        public async Task<IActionResult> Profile()
+        {
+            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            if (email == null)
+            {
+                return Redirect("/");
+            }
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == email);
+            
+
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == users.Email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
         // GET: Users/Create
         public IActionResult Create()
         {

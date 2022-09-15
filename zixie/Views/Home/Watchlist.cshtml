@@ -74,7 +74,12 @@
                             }
                             <td class="first_row"><img title="@comp.Name" src="/img/stocks/@img" onerror="this.onerror=null;this.src='/img/stocks/question.jpg';" height="50" width="50"/></td>
                             <td onclick="window.location.href = '/Home/Detail/@comp.Ticker';">
-                         @comp.Name
+                         <span class="name">
+                             @comp.Name
+                         </span>
+                         <span class="ticker">
+                             @comp.Ticker
+                         </span>
                     </td>
                     <td onclick="window.location.href = '/Home/Detail/@comp.Ticker';">
                        @{
