@@ -22,6 +22,123 @@ namespace zixie.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("zixie.Models.Crypto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Blockchain")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("PriceYesterday")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Symbol")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Time")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("VolumeYesterdayUSD")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Crypto");
+                });
+
+            modelBuilder.Entity("zixie.Models.Portfolio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Id_User")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Portfolio");
+                });
+
+            modelBuilder.Entity("zixie.Models.PortfolioItems", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<float?>("Count")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Date")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Id_Instrument")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Id_Portfolio")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Instrument_Type")
+                        .HasColumnType("int");
+
+                    b.Property<float?>("Price")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PortfolioItems");
+                });
+
+            modelBuilder.Entity("zixie.Models.Prices", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Figi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Prices");
+                });
+
             modelBuilder.Entity("zixie.Models.Shares", b =>
                 {
                     b.Property<int>("Id")
@@ -30,14 +147,14 @@ namespace zixie.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<bool?>("BuyAvailableFlag")
-                        .HasColumnType("bit");
+                    b.Property<int?>("BuyAvailableFlag")
+                        .HasColumnType("int");
 
                     b.Property<string>("Currency")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("DivYieldFlag")
-                        .HasColumnType("bit");
+                    b.Property<int?>("DivYieldFlag")
+                        .HasColumnType("int");
 
                     b.Property<string>("Exchange")
                         .HasColumnType("nvarchar(max)");

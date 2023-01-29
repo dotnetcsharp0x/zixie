@@ -7,12 +7,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - invest</title>
+    <title>@ViewData["Title"] - hacken</title>
     @*
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/mdb.min.css" />*@
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/font-awesome.min.css" />
     <link rel="preload" as="style" onload="this.rel='stylesheet'" href="~/css/site.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
 <body>
     <header class="container-fluid">
@@ -26,7 +28,7 @@
                                   <span class="navbar-toggler-icon"></span>
                                 </button>
                                 <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-                                    <a class="navbar-brand me-auto" href="/">zixie.app</a>
+                                    <a class="navbar-brand me-auto" href="/">hacken.app</a>
                                     @*<ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-top">
                                         <li class="nav-item">
                                             <a class="nav-link text-dark" aria-current="page">Stocks</a>
@@ -79,7 +81,9 @@
                                                 @{
                                                     if(user.IsAuthenticated) {
                                                         <li><a class="dropdown-item" asp-controller="Users" asp-action="Profile">Profile</a></li>
-                                                        <li><a class="dropdown-item" href="#">Portfolio</a></li>
+                                                        <li>
+                                                            <a class="dropdown-item" asp-action="Portfolio" asp-controller="Users" asp-route-id="@ViewData["UserId"]">Portfolio</a>
+                                                        </li>
                                                         <li><hr class="dropdown-divider"></li>
                                                         <li><a class="dropdown-item" asp-controller="Home" asp-action="Logout_Action" >Exit</a></li>
                                                     }
@@ -133,7 +137,7 @@
                         </li>
                         <li class ="nav-item">
                             <i class="fa fa-users"></i>
-                            <a asp-action="Index" asp-controller="Stocks">Users</a>
+                            <a asp-action="Index" asp-controller="Users">Users</a>
                         </li>
                         <li class ="nav-item">
                             <i class="fa fa-comments"></i>
@@ -162,15 +166,16 @@
 </div>
             
         </main>
-    </div>
+    </div> 
 <footer class="border-top footer text-muted w-100 bottom-0">
-    <div class="container">
-        &copy; 2022 - invest - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div class="container d-flex justify-content-center">
+        &copy; 2022 - hacken.app - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
     </div>
 </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/table.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 <script>
 var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))

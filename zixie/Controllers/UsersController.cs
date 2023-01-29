@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -21,8 +22,23 @@ namespace zixie.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
+            var identity = (ClaimsIdentity)User.Identity;
+            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == email);
+            if (id == null) id = 1;
+            id = id - 1;
+            int id_user = 0;
+            if (users != null)
+            {
+                id_user = users.Id;
+                ViewData["UserEmail"] = email;
+                ViewData["UserId"] = users.Id;
+                ViewData["PortfolioNickName"] = users.Nickname;
+            }
+            
             return View(await _context.User.ToListAsync());
         }
 
@@ -42,6 +58,25 @@ namespace zixie.Controllers
             }
 
             return View(user);
+        }
+        // GET: Users/Portfolio/5
+        public async Task<IActionResult> Portfolio(int? id)
+        {
+            var identity = (ClaimsIdentity)User.Identity;
+            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (users != null)
+            {
+                ViewData["UserEmail"] = email;
+                ViewData["UserId"] = users.Id;
+                ViewData["PortfolioNickName"] = users.Nickname;
+            }
+            var query = (from u in _context.Portfolio where u.Id_User == Convert.ToInt32(users.Id) select u);
+            PortfolioViewModel ivm;
+            ivm = new PortfolioViewModel { pPortfolio = query };
+
+            return View(ivm);
         }
 
         // GET: Users/Profile/5
@@ -86,6 +121,22 @@ namespace zixie.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create_Portfolio(string name)
+        {
+            var identity = (ClaimsIdentity)User.Identity;
+            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == email);
+            Portfolio p = new Portfolio();
+            p.Name = name;
+            p.Id_User = users.Id;
+            p.Date = DateTime.Now.ToString();
+            _context.Add(p);
+            _context.SaveChanges();
+            return Redirect($"~/Users/Portfolio/{users.Id}");
         }
 
         // GET: Users/Edit/5

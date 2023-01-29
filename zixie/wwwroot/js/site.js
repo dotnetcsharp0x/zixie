@@ -100,3 +100,19 @@ $('#search-autocomplete').keypress(
         }
     });
 $("#searched-elemets").append('<h6 class="dropdown-header">Type to find</h6>');
+var percentage = $("#percentage").text();
+//console.log("percentage: " + parseFloat(percentage.replace(",",".")).toFixed(2));
+$("#percentage").text(parseFloat(percentage.replace(",", ".")).toFixed(2));
+var price = $("#price").text();
+//console.log("percentage: " + parseFloat(percentage.replace(",",".")).toFixed(2));
+if (parseFloat(price.replace(",", ".")) > 1) {
+    $("#price").text(parseFloat(price.replace(",", ".")).toFixed(2));
+}
+
+function show_modal() {
+    $('#CreateModal').modal('show');
+}
+function hide_modal() {
+    $('#CreateModal').modal('hide');
+}
+

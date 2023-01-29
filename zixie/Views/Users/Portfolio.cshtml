@@ -1,0 +1,108 @@
+﻿@using zixie.Models
+@model PortfolioViewModel
+
+@{
+    ViewData["Title"] = @ViewData["PortfolioNickName"] + " - Portfolio";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-10">
+            <h1>@ViewData["Title"]</h1>
+        </div>
+        <div class="col">
+            <button class="button-crt-portfolio pull-right" onclick="show_modal()">Create</button>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Count</th>
+      <th scope="col">Avg price</th>
+      <th scope="col">Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Microsoft</td>
+      <td>3</td>
+      <td>100</td>
+      <td>110</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Apple</td>
+      <td>50</td>
+      <td>150</td>
+      <td>160</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Oracle</td>
+      <td>3</td>
+      <td>30</td>
+      <td>52</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+        <div class="col-2">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Portfolio wl in Model.pPortfolio)
+                    {
+                        <tr>
+                            <td>
+                                @wl.Name
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="CreateModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter a name for the new portfolio</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="hide_modal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="get" asp-action="Create_Portfolio" asp-controller="Users">
+            <div class="modal-body">
+               
+                    @Html.ValidationSummary(true)
+                    <div class="form-outline mb-4">
+                        <div class="form-group">
+                            <label for="Name">Title</label>
+                            <input type="text" class="form-control" id="Name" name="Name" aria-describedby="Name" placeholder="Enter title">
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="hide_modal()">Close</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

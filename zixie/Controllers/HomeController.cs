@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using System.Transactions;
+using System.Diagnostics;
+using Microsoft.CodeAnalysis;
+using NuGet.Protocol;
 
 namespace zixie.Controllers
 {
@@ -26,7 +29,8 @@ namespace zixie.Controllers
         private readonly zixieContext _context;
         private readonly IHostApplicationLifetime _lifetime;
         private readonly int items_per_page = 10;
-        
+        private readonly int items_per_page_crypto = 50;
+
         #endregion
         #region HomeController
         public HomeController(zixieContext context
@@ -42,27 +46,41 @@ namespace zixie.Controllers
         public async Task<IActionResult> Index(int? id)
         {
             InstrumentsViewModel ivm;
-         //   using (var tx = new System.Transactions.TransactionScope(TransactionScopeOption.Required,
-         //new TransactionOptions() { IsolationLevel = IsolationLevel.ReadUncommitted }))
-         //   {
-                var identity = (ClaimsIdentity)User.Identity;
+            var identity = (ClaimsIdentity)User.Identity;
                 var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
                 var users = await _context.User
                     .FirstOrDefaultAsync(m => m.Email == email);
                 if (id == null) id = 1;
                 id = id - 1;
                 int id_user = 0;
-                if (users != null)
+            ViewData["UserEmail"] = "";
+            ViewData["UserId"] = 0;
+            ViewData["PortfolioNickName"] = "";
+            if (users != null)
                 {
                     id_user = users.Id;
-                }
-                ViewData["UserEmail"] = id_user;
+                ViewData["UserEmail"] = email;
+                ViewData["UserId"] = users.Id;
+                ViewData["PortfolioNickName"] = users.Nickname;
+            }
+                
+            if (id_user>0)
+            {
+                User person = new User();
+                person.Email = users.Email;
+                var claims = new List<Claim> { new Claim(ClaimTypes.Email, person.Email) };
+                // создаем объект ClaimsIdentity
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30)
+                });
+            }
                 int to_skip = (int)id * items_per_page;
                 var first_query = (from p in _context.Shares
-                                       //join i in _context.Watchlists on p equals i.Id into ps// p.Id equals i.Id_Instrument
                                    join i in _context.Watchlists.Where(w => w.Id_User == id_user) on p.Id equals i.Id_Instrument into i_group
                                    from d in i_group.DefaultIfEmpty()
-                                       //where p.Currency == "rub"
                                    select new SharesTable()
                                    {
                                        Name = p.Name,
@@ -82,27 +100,7 @@ namespace zixie.Controllers
                 Console.WriteLine("START:");
                 Console.WriteLine(sql);
                 Console.WriteLine("END:");
-                //            using (var txn = new TransactionScope(
-                //    TransactionScopeOption.Required,
-                //    new TransactionOptions
-                //    {
-                //        IsolationLevel = IsolationLevel.ReadUncommitted
-                //    }
-                //))
-                //            {
-                //                Your LINQ to SQL query goes here
-                //            }
-
-
-                //var prices = (from p in _context.Prices 
-                //              join s in first_query on p.Figi equals s.Figi
-                //              select new Prices() { Figi = s.Figi,Price = p.Price });
                 ivm = new InstrumentsViewModel { SharesTable = first_query };
-
-                //var second_query = (from p in first_query select p).OrderBy(p=>p.Name);
-                //var third_query = (from p in second_query select p).Take(10);
-
-                //System.Diagnostics.Debug.WriteLine("test4: " + user.AuthenticationType + " " + user.Name + " " + user.IsAuthenticated);
                 ViewBag.pages = new List<int> { (int)id - 1, (int)id - 0, (int)id + 1, (int)id + 2, (int)id + 3 };
                 ViewData["Page"] = (int)id + 1;
                 if (users != null)
@@ -151,6 +149,7 @@ namespace zixie.Controllers
             {
                 id_user = users.Id;
             }
+            Console.WriteLine(users.Id);
             var first_query = (from p in _context.Shares
                                    //join i in _context.Watchlists on p equals i.Id into ps// p.Id equals i.Id_Instrument
                                join i in _context.Watchlists.Where(w => w.Id_User == id_user) on p.Id equals i.Id_Instrument into i_group
@@ -213,6 +212,7 @@ namespace zixie.Controllers
         #region Detail
         public async Task<IActionResult> Detail(string? id)
         {
+            
             var back_link = Request.Headers;
             System.Diagnostics.Debug.WriteLine("Back link: " + back_link);
             if (id == null)
@@ -240,6 +240,26 @@ namespace zixie.Controllers
                        orderby u.Id descending
                        where u.Figi == shareModels.First().Figi
                        select u).AsParallel().First();
+            var lstModel = new List<SimpleReportViewModel>();
+            ViewData["date_now"] = DateTime.Now.AddDays(-365);
+            ViewData["min"] = 99999999;
+            string figi = shareModels.First().Figi;
+            var crypto_price = (from u in _context.Prices where u.Figi == figi orderby u.Id select u).Reverse().Take(200).Reverse();
+            foreach (var a in crypto_price)
+            {
+                if (Convert.ToDateTime(a.Date) > Convert.ToDateTime(ViewData["date_now"]))
+                {
+                    if (Convert.ToDecimal(a.Price) < Convert.ToDecimal(ViewData["min"]))
+                    {
+                        ViewData["min"] = a.Price;
+                    }
+                    lstModel.Add(new SimpleReportViewModel
+                    {
+                        DimensionOne = a.Date,
+                        Quantity = a.Price
+                    });
+                }
+            }
             prices.Add(pric);
             if (id_user > 0)
             {
@@ -248,12 +268,74 @@ namespace zixie.Controllers
                     .Where(m => m.Id_Instrument == id_insturment).Where(m => m.Id_User == id_user)
                     .ToList();
 
-                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = watchlistModels,Prices = prices };
+                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = watchlistModels,Prices = prices, SimpleReportViewModel = lstModel };
                 return View(ivm);
             }
             else
             {
-                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = null, Prices = prices };
+                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = shareModels, Watchlists = null, Prices = prices, SimpleReportViewModel = lstModel };
+                return View(ivm);
+            }
+        }
+        #endregion
+        #region Crypto
+        public async Task<IActionResult> Crypto(string? id)
+        {
+            Random rnd = new Random();
+            var lstModel = new List<SimpleReportViewModel>();
+            ViewData["date_now"] = DateTime.Now.AddHours(-24);
+            ViewData["min"] = 99999999;
+            var crypto_price = (from u in _context.Crypto where u.Symbol == id orderby u.Id select u).Reverse().Take(200).Reverse();
+                foreach (var a in crypto_price)
+            {
+                if (Convert.ToDateTime(a.Time) > Convert.ToDateTime(ViewData["date_now"]))
+                {
+                    if (Convert.ToDecimal(a.Price) < Convert.ToDecimal(ViewData["min"]))
+                    {
+                        ViewData["min"] = a.Price;
+                    }
+                    lstModel.Add(new SimpleReportViewModel
+                    {
+                        DimensionOne = a.Time,
+                        Quantity = a.Price
+                    });
+                }
+            }
+            var back_link = Request.Headers;
+            System.Diagnostics.Debug.WriteLine("Back link: " + back_link);
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var someClaim = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            var email = someClaim;
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == email);
+            int id_user = 0;
+            if (users != null)
+            {
+                id_user = users.Id;
+            }
+            List<Shares> prices1 = new List<Shares>();
+            List<Crypto> prices = new List<Crypto>();
+            var pric = ((from u in _context.Crypto
+                         orderby u.Id descending
+                         where u.Symbol == id
+                         select u).AsParallel().First());
+            prices.Add(pric);
+            if (id_user > 0)
+            {
+                //List<Watchlist> watchlistModels = _context.Watchlists
+                //    .Select(c => new Watchlist { Id_Instrument = c.Id_Instrument, Id_User = c.Id_User })
+                //    .Where(m => m.Id_Instrument == id_insturment).Where(m => m.Id_User == id_user)
+                //    .ToList();
+
+                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = prices1, Crypto = prices, SimpleReportViewModel = lstModel };
+                return View(ivm);
+            }
+            else
+            {
+                InstrumentsViewModel ivm = new InstrumentsViewModel { Shares = prices1, Crypto = prices, SimpleReportViewModel = lstModel };
                 return View(ivm);
             }
         }
@@ -398,7 +480,11 @@ namespace zixie.Controllers
                         var claims = new List<Claim> { new Claim(ClaimTypes.Email, person.Email) };
                         // создаем объект ClaimsIdentity
                         ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity),new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30)
+                        });
                     }
                 }
                 return Redirect("/");
@@ -502,5 +588,88 @@ namespace zixie.Controllers
             return _context.User.Any(e => e.Id == id);
         }
         #endregion
+        #region Load_Crypto
+        public async Task<IQueryable<CryptosTable>> Load_Crypto(int? id)
+        {
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
+            InstrumentsViewModel ivm;
+            var identity = (ClaimsIdentity)User.Identity;
+            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == email);
+            if (id == null) id = 1;
+            id = id - 1;
+            int id_user = 0;
+            if (users != null)
+            {
+                id_user = users.Id;
+            }
+            ViewData["UserEmail"] = id_user;
+            int to_skip = (int)id * items_per_page_crypto;
+
+            var prepare = (from p in _context.Crypto select p).GroupBy(x => new { x.Name, x.Address,x.Symbol }).Select(y => new Crypto()
+            {
+                Name = y.Key.Name,
+                Symbol = y.Key.Symbol,
+                Address = y.Key.Address,
+                VolumeYesterdayUSD =(from p in _context.Crypto where p.Symbol == y.Key.Symbol select p).FirstOrDefault().VolumeYesterdayUSD
+            }
+            );
+
+            var first_query = (from p in prepare
+                               select new CryptosTable()
+                               {
+                                   Symbol = p.Symbol,
+                                   Name = p.Name,
+                                   VolumeYesterdayUSD = p.VolumeYesterdayUSD,
+                                   Address = p.Address,
+                                   Price = (float)(from u in _context.Crypto
+                                                   orderby u.Id descending
+                                                   where u.Address == p.Address && u.Name == p.Name
+                                                   select u.Price).AsParallel().FirstOrDefault()
+                               });
+                               //.GroupBy(g => new CryptosTable { p.Symbol, Name, Address, Price });
+                               //.GroupBy(g=>g.Name)
+                               //.OrderBy(x => x.Symbol)
+                              
+            //first_query = (from u in first_query orderby u.Address select u);
+            //Console.WriteLine($"||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||{stopwatch.ElapsedMilliseconds}");
+            //string path = "Logs\\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + DateTime.Now.Hour + ".log";
+            //Console.WriteLine(stopwatch);
+            //float ticks = stopwatch.ElapsedTicks;
+            //float time = stopwatch.ElapsedMilliseconds;
+            //using (StreamWriter writer = new StreamWriter(path, true))
+            //{
+                
+            //    await writer.WriteLineAsync($"CR | {DateTime.Now.ToString()} | {ticks} | {time}");
+            //}
+            //stopwatch.Stop();
+            //string sql = first_query.ToQueryString();
+            Console.WriteLine("START:");
+            //Console.WriteLine(sql);
+            Console.WriteLine("END:");
+            //ivm = new InstrumentsViewModel { CryptosTable = first_query };
+            ViewBag.pages = new List<int> { (int)id - 1, (int)id - 0, (int)id + 1, (int)id + 2, (int)id + 3 };
+            ViewData["Page"] = (int)id + 1;
+            if (users != null)
+            {
+                ViewData["User_Id"] = users.Id;
+            }
+            else
+            {
+                ViewData["User_Id"] = 0;
+            }
+            first_query = first_query.OrderByDescending(x => x.VolumeYesterdayUSD);
+            first_query = first_query.Skip(to_skip).Take(items_per_page_crypto);
+            
+            return first_query;
+        }
+        #endregion
+        public IActionResult Test()
+        {
+            ViewData["Message"] = "Hello!";
+            return View("Test");
+        }
     }
 }

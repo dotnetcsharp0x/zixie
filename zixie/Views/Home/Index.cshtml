@@ -5,6 +5,17 @@
     ViewData["Title"] = "Index";
     var user = Context.User.Identity;
 }
+@*@user.Name <br />
+@user.AuthenticationType<br />
+@user.IsAuthenticated<br />
+@user.AuthenticationType<br />
+@user<br />
+@{
+    if (Context.User.Claims.FirstOrDefault() != null)
+    {
+        @Context.User.Claims.FirstOrDefault().Value
+    }
+}*@
 <div class="container-fluid">
     <div class="row">
         <div class="col">
@@ -14,7 +25,7 @@
     <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#stocks" type="button" role="tab" aria-controls="stocks" aria-selected="true">Stocks</button>
   </li>
   <li class="nav-item" role="presentation">
-    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#crypto" type="button" role="tab" aria-controls="crypto" aria-selected="false">Crypto</button>
+    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#crypto" type="button" role="tab" aria-controls="crypto" aria-selected="false" onclick="load_crypto()">Crypto</button>
   </li>
 </ul>
 <div class="tab-content" id="myTabContent">
@@ -170,7 +181,27 @@
     </div>
 
   </div>
-  <div class="tab-pane fade" id="crypto" role="tabpanel" aria-labelledby="profile-tab">2</div>
+  <div class="tab-pane fade" id="crypto" role="tabpanel" aria-labelledby="profile-tab">
+      <table class="table table-hover" id="table-crypto">
+                <thead>
+    <tr>
+        @if (user.IsAuthenticated)
+                                {
+                                    <th scope="col">
+                                        <span class="d-inline-block star-black" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="top" data-bs-content="Watchlist">
+                    <i class="fa fa-star-o"></i>
+                </span></th>
+                                }
+        <th scope="col" id="column_crypto_img"></th>
+        <th scope="col">Name</th>
+      <th scope="col">Price</th>
+    </tr>
+    </thead>
+    <tbody>
+        
+        </tbody>
+      </table>
+  </div>
 
             
 </div>
