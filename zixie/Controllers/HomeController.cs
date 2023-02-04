@@ -285,7 +285,7 @@ namespace zixie.Controllers
             var lstModel = new List<SimpleReportViewModel>();
             ViewData["date_now"] = DateTime.Now.AddHours(-24);
             ViewData["min"] = 99999999;
-            var crypto_price = (from u in _context.Crypto where u.Symbol == id orderby u.Id select u).Reverse().Take(200).Reverse();
+            var crypto_price = (from u in _context.Crypto where u.Symbol == id orderby u.Id select u).Reverse().Take(2200).Reverse();
                 foreach (var a in crypto_price)
             {
                 if (Convert.ToDateTime(a.Time) > Convert.ToDateTime(ViewData["date_now"]))
@@ -586,6 +586,41 @@ namespace zixie.Controllers
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
+        }
+        #endregion
+        #region PortfolioItems
+        public async Task<IQueryable<PortfolioItemsmodel>> PortfolioItems(int? id)
+        {
+            PortfolioViewModel pvm;
+            var resp = (from u in _context.PortfolioItems where u.Id_Portfolio == id select new PortfolioItemsmodel()
+            { Id=1,
+            Instrument_Type=u.Instrument_Type,
+            Price= (float?)Convert.ToDecimal((from s in _context.PortfolioItems where u.Id_Portfolio == s.Id_Portfolio && u.Id_Instrument == s.Id_Instrument select s.Price).Average())
+            ,Date="!"
+            ,Id_Instrument=u.Id_Instrument
+            ,Id_Portfolio=u.Id_Portfolio,
+            NameInstrument=u.NameInstrument,
+            Ticker=u.Ticker,
+            CuurentPrice= (float?)Convert.ToDecimal((from s in _context.Prices
+                           orderby s.Id descending
+                           where s.Figi == u.Figi
+                           select s.Price).FirstOrDefault().ToString()),
+            Currency =u.Currency,
+            Count=Convert.ToInt32((from s in _context.PortfolioItems where s.Id_Instrument == u.Id_Instrument select s.Count).Sum(g=>g.Value))
+            });
+            //var resp1 = (from s in resp select s).GroupBy(s => s.Id_Instrument).Distinct();
+            //var resp2 = (from d in resp1 select new PortfolioItems
+            //{
+            //    Id=1,
+            //    Instrument_Type = Convert.ToInt32((from y in resp where y.Id_Instrument == d.Value select y.Instrument_Type)),
+            //    Price = (float?)Convert.ToDecimal((from y in resp where y.Id_Instrument == d.Value select y.Price)),
+            //    Date = Convert.ToString((from y in resp where y.Id_Instrument == d.Value select y.Date)),
+            //    Id_Instrument=d.Value,
+            //    Count = Convert.ToInt32((from y in resp where y.Id_Instrument == d.Value select y.Count)),
+            //    Id_Portfolio = Convert.ToInt32((from y in resp where y.Id_Instrument == d.Value select y.Id_Portfolio)),
+            //});
+            ViewBag.Message = id;
+            return resp.Distinct();
         }
         #endregion
         #region Load_Crypto

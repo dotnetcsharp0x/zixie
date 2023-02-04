@@ -14,45 +14,35 @@
             <button class="button-crt-portfolio pull-right" onclick="show_modal()">Create</button>
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <button class="button-crt-portfolio pull-left p-2" onclick="show_modalItem()">Add item</button>
+        </div>
+    </div>
 </div>
+
 
 <div class="container-fluid">
     <div class="row">
         <div class="col">
-            <table class="table">
+
+            <table class="table" id="PortfolioItems">
   <thead>
     <tr>
       <th scope="col">#</th>
+      <th scope="col"></th>
       <th scope="col">Name</th>
       <th scope="col">Count</th>
       <th scope="col">Avg price</th>
       <th scope="col">Price</th>
+      <th scope="col">%</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Microsoft</td>
-      <td>3</td>
-      <td>100</td>
-      <td>110</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Apple</td>
-      <td>50</td>
-      <td>150</td>
-      <td>160</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Oracle</td>
-      <td>3</td>
-      <td>30</td>
-      <td>52</td>
-    </tr>
+   
   </tbody>
 </table>
+
         </div>
         <div class="col-2">
             <table class="table table-hover">
@@ -66,7 +56,7 @@
                 <tbody>
                     @foreach (Portfolio wl in Model.pPortfolio)
                     {
-                        <tr>
+                        <tr class="portfolio_style" onclick="ShowPortfolio('@wl.Id')">
                             <td>
                                 @wl.Name
                             </td>
@@ -78,12 +68,13 @@
     </div>
 </div>
 
+
 <div class="modal" id="CreateModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Enter a name for the new portfolio</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="hide_modal()">
+                <button type="button" class="close border-0" data-dismiss="modal" aria-label="Close" onclick="hide_modal()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -102,6 +93,58 @@
                 <button type="submit" class="btn btn-primary">Create</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="hide_modal()">Close</button>
             </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="CreateModalItem" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter item data</h5>
+                <button type="button" class="close border-0" data-dismiss="modal" aria-label="Close" onclick="hide_modal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="get" asp-action="Create_PortfolioItem" asp-controller="Users">
+                @*@foreach(PortfolioItems comp in Model.pPortfolioItems)
+                {*@
+                <div class="modal-body">
+
+                    @Html.ValidationSummary(true)
+                    <div class="form-outline mb-4">
+                        <div class="col dropdown">
+                        <div id="search-autocompleteItems" class="d-flex search-box">
+                                <input autocomplete="off" id="form1Items" class="w-100 form-control" autocomplete="off" type="text" placeholder="Search: ticker, feed, news, people..." aria-label="Search: ticker, feed, news, people..." data-bs-toggle="dropdown" aria-expanded="false">
+                            <ul id="searched-elemetsItems" class="dropdown-menu dropdown-menu-end w-100" aria-labelledby="search-autocompleteItems">
+                                    <h6 class="dropdown-header">Type to find</h6>
+                            </ul>
+                        </div>
+                        </div>
+                        <input type="text" class="form-control visually-hidden" id="Id_Instrument" name="Id_Instrument" aria-describedby="Id_Instrument" placeholder="Enter instrument id">
+                        <input type="text" class="form-control visually-hidden" id="Instrument_Type" name="Instrument_Type" aria-describedby="Instrument_Type" placeholder="Enter Instrument_Type">
+                        <div class="form-group">
+                            <label for="Count">Count</label>
+                            <input type="text" class="form-control" id="Count" name="Count" autocomplete="off" aria-describedby="Count" placeholder="Enter count">
+                        </div>
+                        <div class="form-group">
+                            <label for="Price">Price</label>
+                            <input type="text" class="form-control" id="Price" name="Price" autocomplete="off" aria-describedby="Price" placeholder="Enter Price">
+                        </div>
+                            <input type="text" class="form-control visually-hidden" id="Id_Portfolio" name="Id_Portfolio" aria-describedby="Id_Portfolio" placeholder="Enter Id_Portfolio">
+                            <input type="text" class="form-control visually-hidden" id="NameInstrument" name="NameInstrument" aria-describedby="NameInstrument" placeholder="Enter NameInstrument">
+                            <input type="text" class="form-control visually-hidden" id="Ticker" name="Ticker" aria-describedby="Ticker" placeholder="Enter Ticker">
+                            <input type="text" class="form-control visually-hidden" id="Currency" name="Currency" aria-describedby="Currency" placeholder="Enter Currency">
+                            <input type="text" class="form-control visually-hidden" id="Figi" name="Figi" aria-describedby="Figi" placeholder="Enter Figi">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="hide_modal()">Close</button>
+                </div>
+                @*}*@
             </form>
         </div>
     </div>

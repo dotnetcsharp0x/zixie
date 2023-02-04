@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using zixie.Data;
 
@@ -11,9 +12,10 @@ using zixie.Data;
 namespace zixie.Migrations
 {
     [DbContext(typeof(zixieContext))]
-    partial class zixieContextModelSnapshot : ModelSnapshot
+    [Migration("20230204194425_add_columncurrency")]
+    partial class add_columncurrency
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,9 +101,6 @@ namespace zixie.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Date")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Figi")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Id_Instrument")

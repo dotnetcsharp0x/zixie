@@ -138,6 +138,22 @@ namespace zixie.Controllers
             _context.SaveChanges();
             return Redirect($"~/Users/Portfolio/{users.Id}");
         }
+        //[HttpGet("{pvm}/{portfolioid}")]
+        [HttpGet]
+        public async Task<IActionResult> Create_PortfolioItem(PortfolioItems pvm)
+        {
+            Console.WriteLine(pvm);
+            //Console.WriteLine(pId);
+            var identity = (ClaimsIdentity)User.Identity;
+            var email = HttpContext.User.Claims.Select(i => i.Value).FirstOrDefault();
+            var users = await _context.User
+                .FirstOrDefaultAsync(m => m.Email == email);
+            pvm.Date= DateTime.Now.ToString();
+            //pvm.Id_Portfolio = Convert.ToInt32(ViewBag.Message);
+            _context.PortfolioItems.Add(pvm);
+            _context.SaveChanges();
+            return Redirect($"~/Users/Portfolio/"+users.Id);
+        }
 
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)

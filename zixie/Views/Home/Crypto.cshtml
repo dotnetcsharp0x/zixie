@@ -26,7 +26,7 @@
     {
         var img = @comp.Symbol + ".png";
            <div class="col-xl-8 d-inline-flex">
-        <div class="align-self-center p-2">
+        <div class="align-self-center">
             <img title="@comp.Name" src="/img/crypto/@img" onerror="this.onerror=null;this.src='/img/stocks/question.jpg';" height="50" width="50"/>
         </div>
         <div class="align-self-center p-2">
@@ -37,7 +37,7 @@
         </div>
     </div>
     <div class="col-xl-4 align-middle p-2">
-                <h2>@{
+                <h2 class="pull-right">@{
                         
                                     var result = "$";
                                     <div class="info-price-name">

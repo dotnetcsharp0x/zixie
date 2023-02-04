@@ -1,6 +1,6 @@
 ﻿namespace zixie.Models
 {
-    public class PortfolioItems
+    public class PortfolioItemsmodel
     {
         public int Id { get; set; }
         public int? Id_Portfolio { get; set; }
@@ -11,6 +11,7 @@
         public string? Currency { get; set; }
         public float? Count { get; set; }
         public float? Price { get; set; }
+        public float? CuurentPrice { get; set; }
         public string? Figi { get; set; }
         public string? Date { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tinkoff.InvestApi.V1;
 using zixie.Data;
 using zixie.Models;
 
@@ -25,10 +26,12 @@ namespace zixie.Controllers
                                 where s.Ticker.Contains(@"" + id + "") ||  s.Name.Contains(@"" + id + "")
                                 select new SharesTable()
                                 {
+                                    Id=s.Id,
                                     Name = s.Name,
                                     Currency = s.Currency,
                                     Ticker = s.Ticker,
                                     Figi = s.Figi,
+                                    InstrumentType=1,
                                     Price = (from u in _context.Prices
                                              orderby u.Id descending
                                              where u.Figi == s.Figi

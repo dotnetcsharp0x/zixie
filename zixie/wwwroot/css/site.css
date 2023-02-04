@@ -260,6 +260,23 @@ td .ticker {
     color:black;
 }
 
+.portfolio_style {
+    cursor:pointer;
+}
+
+.img-portfolioitems {
+    width:50px;
+}
+.first_column_portfolioitems {
+    width: 40px;
+}
+#PortfolioItems tbody tr td {
+    vertical-align: middle;
+}
+#PortfolioItems tbody tr td a{
+    text-decoration:none;
+    color:black;
+}
 /// Cards ///
 cards {
     width: 90%;

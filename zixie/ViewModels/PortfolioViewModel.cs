@@ -10,5 +10,5 @@ public class PortfolioViewModel
     public IEnumerable<Prices> pPrices { get; set; }
     public IEnumerable<CryptosTable> pCryptosTable { get; set; }
     public IEnumerable<Portfolio>? pPortfolio { get; set; }
-    public IEnumerable<PortfolioItems> pPortfolioItems { get; set; }
+    public IEnumerable<PortfolioItemsmodel> pPortfolioItems { get; set; }
 }
